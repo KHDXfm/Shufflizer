@@ -3,6 +3,8 @@
 
 Shufflizer was coded by [Jacob Turner](http://jacobturner.me), who releases this code under the MIT license.
 
+**NOTE: Some features are dependent on [Nicecast](https://www.rogueamoeba.com/nicecast/) by Rogue Amoeba Software.
+
 This project uses the following libraries:
 * [Mutagen](https://mutagen.readthedocs.io), released under the GPL license
 * [VLC Python bindings](https://wiki.videolan.org/Python_bindings), released under the LGPL license
