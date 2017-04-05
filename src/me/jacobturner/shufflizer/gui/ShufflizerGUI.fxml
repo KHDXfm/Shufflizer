@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefWidth="360.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.jacobturner.shufflizer.gui.ShufflizerController">
+   <top>
+      <Label text="Shufflizer" BorderPane.alignment="CENTER">
+         <font>
+            <Font name="System Bold" size="26.0" />
+         </font>
+      </Label>
+   </top>
+   <left>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <Label text="Now Playing:" />
+         </children>
+      </VBox>
+   </left>
+   <right>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="nowPlayingLabel">
+          		<font>
+            		<Font name="System Bold" size="12.0" />
+         		</font>
+         	</Label>
+         </children>
+      </VBox>
+   </right>
+   <bottom>
+      <HBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="playStopButton" mnemonicParsing="false" onAction="#pressPlay" text="Play">
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin></Button>
+            <Button fx:id="optionsButton" mnemonicParsing="false" text="Options">
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin></Button>
+            <Button fx:id="exitButton" mnemonicParsing="false" text="Exit" />
+         </children>
+      </HBox>
+   </bottom>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</BorderPane>
