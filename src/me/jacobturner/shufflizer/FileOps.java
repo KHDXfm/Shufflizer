@@ -23,15 +23,15 @@ public class FileOps {
 	}
 	
 	public static String genreCheck() throws Exception {
-		String genre = null;
-		BufferedReader br = null;
+		String genre = "";
 		String line = "";
 		String cvsSplitBy = ",";
 		String currentDayOfWeek = DateTimeFormatter.ofPattern("EEEE").format(LocalDateTime.now());
 		String currentTimeString = DateTimeFormatter.ofPattern("HH:mm").format(LocalDateTime.now());
 		File scheduleFile = new File("schedule.csv");
 		if (scheduleFile.exists()) {
-			br = new BufferedReader(new FileReader("schedule.csv"));
+			FileReader fr = new FileReader(scheduleFile);
+			BufferedReader br = new BufferedReader(fr);
 			while ((line = br.readLine()) != null) {
 				String[] genreLine = line.split(cvsSplitBy);
 				if (currentDayOfWeek.equals(genreLine[0])) {
@@ -47,10 +47,10 @@ public class FileOps {
 							}
 						}
 					}
-				}
-					
+				}	
 			}
-			if (br != null) {br.close();}
+			fr.close();
+			br.close();
 		}
 		return genre; 
 	}
