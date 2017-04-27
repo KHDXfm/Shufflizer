@@ -27,7 +27,7 @@ public class Logger {
 	}
 	
 	public static void changeNowPlayingTxt(String songString) throws Exception {
-		ArrayList<String> songData = new ArrayList<String>(Arrays.asList(songString.split(",")));
+		ArrayList<String> songData = new ArrayList<String>(Arrays.asList(songString.split(" - ")));
 		Options options = new Options();
 		File txtFile = new File(options.getValue("now_playing_path"));
 		if (!txtFile.exists()) {

@@ -6,14 +6,25 @@ import java.io.FileReader;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class FileOps {
 	private static Options options = new Options();
 	
-	public static File[] getMusicFileList(String genre) {
-		File[] fileList =  new File(options.getValue("song_path")).listFiles();
+	public static ArrayList<File> getMusicFileList(String genre) {
+		ArrayList<File> fileList = new ArrayList<File>();
 		if (genre != null) {
-			//DO STUFF HERE
+			fileList.addAll(Arrays.asList(new File(options.getValue("song_path") + "/" + genre).listFiles()));
+		} else {
+			try {
+				ArrayList<String> genres = getGenres();
+				for (String g: genres) {
+					fileList.addAll(Arrays.asList(new File(options.getValue("song_path") + "/" + g).listFiles()));
+				}
+			} catch (Exception e) {
+				fileList.addAll(Arrays.asList(new File(options.getValue("song_path")).listFiles()));
+			}
 		}
 		return fileList;
 	}
@@ -53,5 +64,23 @@ public class FileOps {
 			br.close();
 		}
 		return genre; 
+	}
+	
+	public static ArrayList<String> getGenres() throws Exception {
+		ArrayList<String> genres = new ArrayList<String>();
+		String line = "";
+		String cvsSplitBy = ",";
+		File scheduleFile = new File("schedule.csv");
+		if (scheduleFile.exists()) {
+			FileReader fr = new FileReader(scheduleFile);
+			BufferedReader br = new BufferedReader(fr);
+			while ((line = br.readLine()) != null) {
+				String[] genreLine = line.split(cvsSplitBy);
+				genres.add(genreLine[3]);
+			}
+			fr.close();
+			br.close();
+		}
+		return genres;
 	}
 }

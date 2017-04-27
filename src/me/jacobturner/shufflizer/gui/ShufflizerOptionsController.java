@@ -18,6 +18,8 @@ public class ShufflizerOptionsController {
 	@FXML
 	private TextField logDateFormat;
 	@FXML
+	private TextField stationName;
+	@FXML
 	private Button saveButton;
 	
 	public void initialize() {
@@ -27,12 +29,14 @@ public class ShufflizerOptionsController {
 		nowPlayingPath.setText(options.getValue("now_playing_path"));
 		timeBetweenIDs.setText(options.getValue("time_between_ids"));
 		logDateFormat.setText(options.getValue("log_date_format"));
+		stationName.setText(options.getValue("station_name"));
 		saveButton.setOnAction(event -> {
 			options.setValue("song_path", songPath.getText());
 			options.setValue("id_path", idPath.getText());
 			options.setValue("now_playing_path", nowPlayingPath.getText());
 			options.setValue("time_between_ids", timeBetweenIDs.getText());
 			options.setValue("log_date_format", logDateFormat.getText());
+			options.setValue("station_name", stationName.getText());
 			options.close();
 			try {
 				Stage stage = (Stage)saveButton.getScene().getWindow();

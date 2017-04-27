@@ -1,6 +1,7 @@
 package me.jacobturner.shufflizer.gui;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.mpatric.mp3agic.ID3v1;
@@ -36,11 +37,12 @@ public class ShufflizerController {
 	public Label nowPlayingLabel;
 
 	Options options = new Options();
-	public int prevMusicInt;
+	public ArrayList<File> prevMusicPlayed = new ArrayList<File>();
 	public int secondsCount;
 	public Random random = new Random();
 	public Thread musicThread;
 	public Mp3File musicMp3file;
+	public File musicFile;
 
 	public void initialize() {
 		optionsButton.setOnAction(event -> {
@@ -70,17 +72,6 @@ public class ShufflizerController {
 		Alert alert = new Alert(alertType, message);
 		alert.showAndWait();
 	}
-
-	@FXML
-	public void pressStop() {
-		if (playStopButton.getText().equals("Stop")) {
-			playStopButton.setText("Play");
-			playStopButton.setOnAction(event -> pressPlay());
-			musicThread.interrupt();
-			nowPlayingLabel.setText("Not playing...");
-			nowPlayingLabel.setTextFill(Color.RED);
-		}
-	}
 	
 	public void updateNowPlayingText(String newLabel) {
 		Platform.runLater(new Runnable() {
@@ -91,6 +82,7 @@ public class ShufflizerController {
 					Logger.logSong(newLabel);
 					Logger.changeNowPlayingTxt(newLabel);
 				} catch (Exception e) {
+					e.printStackTrace();
 					outputMessage(AlertType.ERROR, e.getMessage());
 				}
 			}
@@ -126,7 +118,7 @@ public class ShufflizerController {
 								ID3v2 id3v2Tag = musicMp3file.getId3v2Tag();
 								updateNowPlayingText(id3v2Tag.getTitle() + " - " + id3v2Tag.getArtist());
 							} else {
-								updateNowPlayingText("Station Identification");
+								updateNowPlayingText(options.getValue("station_name") + " - Station Identification");
 							}
 							updateNowPlayingColor(Color.BLUE);
 							secondsCount = 0;
@@ -136,11 +128,20 @@ public class ShufflizerController {
 						}
 					} else {
 						try {
-							String isTimeForGenre = FileOps.genreCheck();
-							File[] musicFileList = FileOps.getMusicFileList(isTimeForGenre);
-							int musicFileIndex = random.nextInt(musicFileList.length);
-							File musicFile = musicFileList[musicFileIndex];
-							prevMusicInt = musicFileIndex;
+							String genreToPlay = FileOps.genreCheck();
+							ArrayList<File> musicFileList = FileOps.getMusicFileList(genreToPlay);
+							noRepeatsLoop:
+							while(true) {
+								int musicFileIndex = random.nextInt(musicFileList.size());
+								musicFile = musicFileList.get(musicFileIndex);
+								if (!prevMusicPlayed.contains(musicFile)) {
+									if (prevMusicPlayed.size() > 5) {
+										prevMusicPlayed.remove(0);
+									}
+									prevMusicPlayed.add(musicFile);
+									break noRepeatsLoop;
+								}
+							}
 							Media media = new Media(musicFile.toURI().toString());
 							MediaPlayer musicPlayer = new MediaPlayer(media);
 							musicMp3file = new Mp3File(musicFile.getAbsolutePath());
@@ -151,18 +152,20 @@ public class ShufflizerController {
 								ID3v2 id3v2Tag = musicMp3file.getId3v2Tag();
 								updateNowPlayingText(id3v2Tag.getTitle() + " - " + id3v2Tag.getArtist());
 							} else {
-								updateNowPlayingText("KHDX Radio");
+								updateNowPlayingText(options.getValue("station_name") + " - " + options.getValue("station_name"));
 							}
 							updateNowPlayingColor(Color.BLACK);
 							secondsCount += musicMp3file.getLengthInSeconds();
 							musicPlayer.play();
 						} catch (Exception e) {
+							e.printStackTrace();
 							outputMessage(AlertType.ERROR, e.getMessage());
 						}
 					}
 					try {
-						Thread.sleep(musicMp3file.getLengthInSeconds() * 1000);
+						Thread.sleep(musicMp3file.getLengthInMilliseconds());
 					} catch (InterruptedException e) {
+						e.printStackTrace();
 						outputMessage(AlertType.ERROR, e.getMessage());
 					}
 				}
@@ -178,5 +181,14 @@ public class ShufflizerController {
 			playStopButton.setOnAction(event -> pressStop());
 			playMusic();
 		}
+	}
+	
+	@FXML
+	public void pressStop() {
+		playStopButton.setText("Play");
+		playStopButton.setOnAction(event -> pressPlay());
+		musicThread.interrupt();
+		nowPlayingLabel.setText("Not playing...");
+		nowPlayingLabel.setTextFill(Color.RED);
 	}
 }
