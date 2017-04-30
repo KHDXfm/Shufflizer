@@ -43,6 +43,7 @@ public class ShufflizerController {
 	public Thread musicThread;
 	public Mp3File musicMp3file;
 	public File musicFile;
+	public MediaPlayer musicPlayer;
 
 	public void initialize() {
 		optionsButton.setOnAction(event -> {
@@ -108,7 +109,7 @@ public class ShufflizerController {
 						int idIndex = random.nextInt(stationIDFileList.length);
 						File idFile = stationIDFileList[idIndex];
 						Media media = new Media(idFile.toURI().toString());
-						MediaPlayer musicPlayer = new MediaPlayer(media);
+						musicPlayer = new MediaPlayer(media);
 						try {
 							musicMp3file = new Mp3File(idFile.getAbsolutePath());
 							if (musicMp3file.hasId3v1Tag()) {
@@ -143,7 +144,7 @@ public class ShufflizerController {
 								}
 							}
 							Media media = new Media(musicFile.toURI().toString());
-							MediaPlayer musicPlayer = new MediaPlayer(media);
+							musicPlayer = new MediaPlayer(media);
 							musicMp3file = new Mp3File(musicFile.getAbsolutePath());
 							if (musicMp3file.hasId3v1Tag()) {
 								ID3v1 id3v1Tag = musicMp3file.getId3v1Tag();

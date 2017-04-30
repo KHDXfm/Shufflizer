@@ -13,6 +13,7 @@ public class Shufflizer extends Application {
 			BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("ShufflizerGUI.fxml"));
 			Scene scene = new Scene(root);
 			primaryStage.setScene(scene);
+			primaryStage.setTitle("Shufflizer");
 			primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();

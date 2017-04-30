@@ -2,6 +2,7 @@ package me.jacobturner.shufflizer;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -15,15 +16,41 @@ public class FileOps {
 	public static ArrayList<File> getMusicFileList(String genre) {
 		ArrayList<File> fileList = new ArrayList<File>();
 		if (genre != null) {
-			fileList.addAll(Arrays.asList(new File(options.getValue("song_path") + "/" + genre).listFiles()));
+			try {
+				fileList.addAll(Arrays.asList(new File(options.getValue("song_path") + "/" + genre).listFiles(new FileFilter() {
+				    @Override
+				    public boolean accept(File pathname) {return pathname.isFile();}
+				})));
+			} catch (Exception e) {
+				try {
+					ArrayList<String> genres = getGenres();
+					for (String g: genres) {
+						fileList.addAll(Arrays.asList(new File(options.getValue("song_path") + "/" + g).listFiles(new FileFilter() {
+						    @Override
+						    public boolean accept(File pathname) {return pathname.isFile();}
+						})));
+					}
+				} catch (Exception e2) {
+					fileList.addAll(Arrays.asList(new File(options.getValue("song_path")).listFiles(new FileFilter() {
+					    @Override
+					    public boolean accept(File pathname) {return pathname.isFile();}
+					})));
+				}
+			}
 		} else {
 			try {
 				ArrayList<String> genres = getGenres();
 				for (String g: genres) {
-					fileList.addAll(Arrays.asList(new File(options.getValue("song_path") + "/" + g).listFiles()));
+					fileList.addAll(Arrays.asList(new File(options.getValue("song_path") + "/" + g).listFiles(new FileFilter() {
+					    @Override
+					    public boolean accept(File pathname) {return pathname.isFile();}
+					})));
 				}
 			} catch (Exception e) {
-				fileList.addAll(Arrays.asList(new File(options.getValue("song_path")).listFiles()));
+				fileList.addAll(Arrays.asList(new File(options.getValue("song_path")).listFiles(new FileFilter() {
+				    @Override
+				    public boolean accept(File pathname) {return pathname.isFile();}
+				})));
 			}
 		}
 		return fileList;
