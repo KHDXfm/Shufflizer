@@ -2,6 +2,7 @@ package me.jacobturner.shufflizer.gui;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Random;
 
 import com.mpatric.mp3agic.ID3v1;
@@ -10,18 +11,18 @@ import com.mpatric.mp3agic.Mp3File;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import me.jacobturner.shufflizer.FileOps;
 import me.jacobturner.shufflizer.Logger;
 import me.jacobturner.shufflizer.Options;
@@ -47,18 +48,41 @@ public class ShufflizerController {
 
 	public void initialize() {
 		optionsButton.setOnAction(event -> {
-			try {
-				Stage dialog = new Stage();
-				dialog.initModality(Modality.APPLICATION_MODAL);
-				dialog.initOwner(optionsButton.getScene().getWindow());
-				BorderPane optionsWindow = (BorderPane)FXMLLoader.load(getClass().getResource("ShufflizerOptionsGUI.fxml"));
-				Scene scene = new Scene(optionsWindow);
-				dialog.setScene(scene);
-				dialog.setTitle("Options");
-				dialog.show();
-			} catch (Exception error) {
-				error.printStackTrace();
-				outputMessage(AlertType.ERROR, error.getMessage());
+			Dialog<ButtonType> dialog = new Dialog<>();
+			dialog.setTitle("Shufflizer Options");
+			dialog.setHeaderText("Shufflizer Options");
+			ButtonType saveButtonType = new ButtonType("Save", ButtonData.OK_DONE);
+			dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
+			GridPane grid = new GridPane();
+			grid.setHgap(10);
+			grid.setVgap(10);
+			TextField songPath = new TextField(options.getValue("song_path"));
+			TextField idPath = new TextField(options.getValue("id_path"));
+			TextField nowPlayingPath = new TextField(options.getValue("now_playing_path"));
+			TextField timeBetweenIDs = new TextField(options.getValue("time_between_ids"));
+			TextField logDateFormat = new TextField(options.getValue("log_date_format"));
+			TextField stationName = new TextField(options.getValue("station_name"));
+			grid.add(new Label("Song Path"), 0, 0);
+			grid.add(songPath, 1, 0);
+			grid.add(new Label("ID Path"), 0, 1);
+			grid.add(idPath, 1, 1);
+			grid.add(new Label("NowPlaying.txt Path"), 0, 2);
+			grid.add(nowPlayingPath, 1, 2);
+			grid.add(new Label("Time Between IDs (sec)"), 0, 3);
+			grid.add(timeBetweenIDs, 1, 3);
+			grid.add(new Label("Log Date Format"), 0, 4);
+			grid.add(logDateFormat, 1, 4);
+			grid.add(new Label("Station Name"), 0, 5);
+			grid.add(stationName, 1, 5);
+			dialog.getDialogPane().setContent(grid);
+			Optional<ButtonType> result = dialog.showAndWait();
+			if (result.isPresent() && result.get() == saveButtonType){
+				options.setValue("song_path", songPath.getText());
+				options.setValue("id_path", idPath.getText());
+				options.setValue("now_playing_path", nowPlayingPath.getText());
+				options.setValue("time_between_ids", timeBetweenIDs.getText());
+				options.setValue("log_date_format", logDateFormat.getText());
+				options.setValue("station_name", stationName.getText());
 			}
 		});
 		exitButton.setOnAction(event -> {
@@ -177,11 +201,9 @@ public class ShufflizerController {
 
 	@FXML
 	public void pressPlay() {
-		if (playStopButton.getText().equals("Play")) {
-			playStopButton.setText("Stop");
-			playStopButton.setOnAction(event -> pressStop());
-			playMusic();
-		}
+		playStopButton.setText("Stop");
+		playStopButton.setOnAction(event -> pressStop());
+		playMusic();
 	}
 	
 	@FXML
