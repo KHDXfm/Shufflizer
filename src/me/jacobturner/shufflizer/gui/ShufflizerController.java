@@ -94,8 +94,13 @@ public class ShufflizerController {
 	}
 
 	public void outputMessage(AlertType alertType, String message) {
-		Alert alert = new Alert(alertType, message);
-		alert.showAndWait();
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				Alert alert = new Alert(alertType, message);
+				alert.showAndWait();
+			}
+		});
 	}
 	
 	public void updateNowPlayingText(String newLabel) {

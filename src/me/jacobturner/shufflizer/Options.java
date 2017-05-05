@@ -9,8 +9,8 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 public class Options {
-	InputStream input = null;
-	OutputStream output = null;
+	InputStream input;
+	OutputStream output;
 	Properties prop = new Properties();
 	
 	public Options() {
