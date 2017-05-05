@@ -2,7 +2,6 @@ package me.jacobturner.shufflizer.gui;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.Random;
 
 import com.mpatric.mp3agic.ID3v1;
@@ -75,15 +74,16 @@ public class ShufflizerController {
 			grid.add(new Label("Station Name"), 0, 5);
 			grid.add(stationName, 1, 5);
 			dialog.getDialogPane().setContent(grid);
-			Optional<ButtonType> result = dialog.showAndWait();
-			if (result.isPresent() && result.get() == saveButtonType){
-				options.setValue("song_path", songPath.getText());
-				options.setValue("id_path", idPath.getText());
-				options.setValue("now_playing_path", nowPlayingPath.getText());
-				options.setValue("time_between_ids", timeBetweenIDs.getText());
-				options.setValue("log_date_format", logDateFormat.getText());
-				options.setValue("station_name", stationName.getText());
-			}
+			dialog.showAndWait().ifPresent(result -> {
+				if (result == saveButtonType) {
+					options.setValue("song_path", songPath.getText());
+					options.setValue("id_path", idPath.getText());
+					options.setValue("now_playing_path", nowPlayingPath.getText());
+					options.setValue("time_between_ids", timeBetweenIDs.getText());
+					options.setValue("log_date_format", logDateFormat.getText());
+					options.setValue("station_name", stationName.getText());
+				}
+			});
 		});
 		exitButton.setOnAction(event -> {
 			Platform.exit();
