@@ -134,12 +134,12 @@ public class ShufflizerController {
 		    public void run() {
 		    	while(true){
 					if (secondsCount >= Integer.parseInt(options.getValue("time_between_ids"))) {
-						File[] stationIDFileList = FileOps.getStationIDFileList();
-						int idIndex = random.nextInt(stationIDFileList.length);
-						File idFile = stationIDFileList[idIndex];
-						Media media = new Media(idFile.toURI().toString());
-						musicPlayer = new MediaPlayer(media);
 						try {
+							File[] stationIDFileList = FileOps.getStationIDFileList();
+							int idIndex = random.nextInt(stationIDFileList.length);
+							File idFile = stationIDFileList[idIndex];
+							Media media = new Media(idFile.toURI().toString());
+							musicPlayer = new MediaPlayer(media);
 							musicMp3file = new Mp3File(idFile.getAbsolutePath());
 							if (musicMp3file.hasId3v1Tag()) {
 								ID3v1 id3v1Tag = musicMp3file.getId3v1Tag();
@@ -153,7 +153,14 @@ public class ShufflizerController {
 							updateNowPlayingColor(Color.BLUE);
 							secondsCount = 0;
 							musicPlayer.play();
+							try {
+								Thread.sleep(musicMp3file.getLengthInMilliseconds());
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+								outputMessage(AlertType.ERROR, e.getMessage());
+							}
 						} catch (Exception e) {
+							e.printStackTrace();
 							outputMessage(AlertType.ERROR, e.getMessage());
 						}
 					} else {
@@ -187,16 +194,16 @@ public class ShufflizerController {
 							updateNowPlayingColor(Color.BLACK);
 							secondsCount += musicMp3file.getLengthInSeconds();
 							musicPlayer.play();
+							try {
+								Thread.sleep(musicMp3file.getLengthInMilliseconds());
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+								outputMessage(AlertType.ERROR, e.getMessage());
+							}
 						} catch (Exception e) {
 							e.printStackTrace();
 							outputMessage(AlertType.ERROR, e.getMessage());
 						}
-					}
-					try {
-						Thread.sleep(musicMp3file.getLengthInMilliseconds());
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						outputMessage(AlertType.ERROR, e.getMessage());
 					}
 				}
 		    }         
