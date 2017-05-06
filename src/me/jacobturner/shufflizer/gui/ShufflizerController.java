@@ -20,6 +20,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import me.jacobturner.shufflizer.FileOps;
@@ -43,6 +44,7 @@ public class ShufflizerController {
 	public Thread musicThread;
 	public Mp3File musicMp3file;
 	public File musicFile;
+	public File idFile;
 	public MediaPlayer musicPlayer;
 
 	public void initialize() {
@@ -137,7 +139,7 @@ public class ShufflizerController {
 						try {
 							File[] stationIDFileList = FileOps.getStationIDFileList();
 							int idIndex = random.nextInt(stationIDFileList.length);
-							File idFile = stationIDFileList[idIndex];
+							idFile = stationIDFileList[idIndex];
 							Media media = new Media(idFile.toURI().toString());
 							musicPlayer = new MediaPlayer(media);
 							musicMp3file = new Mp3File(idFile.getAbsolutePath());
@@ -156,6 +158,14 @@ public class ShufflizerController {
 							try {
 								Thread.sleep(musicMp3file.getLengthInMilliseconds());
 							} catch (InterruptedException e) {
+								e.printStackTrace();
+								outputMessage(AlertType.ERROR, e.getMessage());
+							}
+						} catch (MediaException me) {
+							me.printStackTrace();
+							try {
+								Logger.logSong("Attempted: " + idFile.toURI().toString());
+							} catch (Exception e) {
 								e.printStackTrace();
 								outputMessage(AlertType.ERROR, e.getMessage());
 							}
@@ -197,6 +207,14 @@ public class ShufflizerController {
 							try {
 								Thread.sleep(musicMp3file.getLengthInMilliseconds());
 							} catch (InterruptedException e) {
+								e.printStackTrace();
+								outputMessage(AlertType.ERROR, e.getMessage());
+							}
+						} catch (MediaException me) {
+							me.printStackTrace();
+							try {
+								Logger.logSong("Attempted: " + musicFile.toURI().toString());
+							} catch (Exception e) {
 								e.printStackTrace();
 								outputMessage(AlertType.ERROR, e.getMessage());
 							}
