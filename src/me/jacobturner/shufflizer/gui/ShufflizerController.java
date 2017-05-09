@@ -134,6 +134,7 @@ public class ShufflizerController {
 		musicThread = new Thread(new Runnable() {
 		    @Override
 		    public void run() {
+		    	musicPlayingLoop:
 		    	while(true){
 					if (secondsCount >= Integer.parseInt(options.getValue("time_between_ids"))) {
 						try {
@@ -158,8 +159,9 @@ public class ShufflizerController {
 							try {
 								Thread.sleep(musicMp3file.getLengthInMilliseconds());
 							} catch (InterruptedException e) {
-								e.printStackTrace();
-								outputMessage(AlertType.ERROR, e.getMessage());
+								musicPlayer.stop();
+								prevMusicPlayed.clear();
+								break musicPlayingLoop;
 							}
 						} catch (MediaException me) {
 							me.printStackTrace();
@@ -207,8 +209,10 @@ public class ShufflizerController {
 							try {
 								Thread.sleep(musicMp3file.getLengthInMilliseconds());
 							} catch (InterruptedException e) {
-								e.printStackTrace();
-								outputMessage(AlertType.ERROR, e.getMessage());
+								musicPlayer.stop();
+								prevMusicPlayed.clear();
+								secondsCount = 0;
+								break musicPlayingLoop;
 							}
 						} catch (MediaException me) {
 							me.printStackTrace();
