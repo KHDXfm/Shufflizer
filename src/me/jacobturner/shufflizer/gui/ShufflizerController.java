@@ -1,6 +1,8 @@
 package me.jacobturner.shufflizer.gui;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -16,9 +18,11 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
@@ -95,11 +99,25 @@ public class ShufflizerController {
 		nowPlayingLabel.setTextFill(Color.RED);
 	}
 
-	public void outputMessage(AlertType alertType, String message) {
+	public void outputMessage(AlertType alertType, String message, String stackTrace) {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				Alert alert = new Alert(alertType, message);
+				Alert alert = new Alert(alertType);
+				alert.setContentText(message);
+				Label label = new Label("Full stacktrace:");
+				TextArea textArea = new TextArea(stackTrace);
+				textArea.setEditable(false);
+				textArea.setWrapText(true);
+				textArea.setMaxWidth(Double.MAX_VALUE);
+				textArea.setMaxHeight(Double.MAX_VALUE);
+				GridPane.setVgrow(textArea, Priority.ALWAYS);
+				GridPane.setHgrow(textArea, Priority.ALWAYS);
+				GridPane expContent = new GridPane();
+				expContent.setMaxWidth(Double.MAX_VALUE);
+				expContent.add(label, 0, 0);
+				expContent.add(textArea, 0, 1);
+				alert.getDialogPane().setExpandableContent(expContent);
 				alert.showAndWait();
 			}
 		});
@@ -115,7 +133,10 @@ public class ShufflizerController {
 					Logger.changeNowPlayingTxt(newLabel);
 				} catch (Exception e) {
 					e.printStackTrace();
-					outputMessage(AlertType.ERROR, e.getMessage());
+					StringWriter sw = new StringWriter();
+					PrintWriter pw = new PrintWriter(sw);
+					e.printStackTrace(pw);
+					outputMessage(AlertType.ERROR, e.getMessage(), sw.toString());
 				}
 			}
 		});
@@ -169,11 +190,17 @@ public class ShufflizerController {
 								Logger.logSong("Attempted: " + idFile.toURI().toString());
 							} catch (Exception e) {
 								e.printStackTrace();
-								outputMessage(AlertType.ERROR, e.getMessage());
+								StringWriter sw = new StringWriter();
+								PrintWriter pw = new PrintWriter(sw);
+								e.printStackTrace(pw);
+								outputMessage(AlertType.ERROR, e.getMessage(), sw.toString());
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
-							outputMessage(AlertType.ERROR, e.getMessage());
+							StringWriter sw = new StringWriter();
+							PrintWriter pw = new PrintWriter(sw);
+							e.printStackTrace(pw);
+							outputMessage(AlertType.ERROR, e.getMessage(), sw.toString());
 						}
 					} else {
 						try {
@@ -220,11 +247,17 @@ public class ShufflizerController {
 								Logger.logSong("Attempted: " + musicFile.toURI().toString());
 							} catch (Exception e) {
 								e.printStackTrace();
-								outputMessage(AlertType.ERROR, e.getMessage());
+								StringWriter sw = new StringWriter();
+								PrintWriter pw = new PrintWriter(sw);
+								e.printStackTrace(pw);
+								outputMessage(AlertType.ERROR, e.getMessage(), sw.toString());
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
-							outputMessage(AlertType.ERROR, e.getMessage());
+							StringWriter sw = new StringWriter();
+							PrintWriter pw = new PrintWriter(sw);
+							e.printStackTrace(pw);
+							outputMessage(AlertType.ERROR, e.getMessage(), sw.toString());
 						}
 					}
 				}
