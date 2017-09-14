@@ -163,11 +163,7 @@ public class ShufflizerController {
 		    public void run() {
 		    	musicPlayingLoop:
 		    	while(true){
-		    		for (String key : timeSinceArtistsLastSong.keySet()) {
-		    			if (new Date().getTime() >= (timeSinceArtistsLastSong.get(key) + (Long.parseLong(options.getValue("time_between_artists")) * 60000))) {
-							timeSinceArtistsLastSong.remove(key);
-						}
-		    		}
+		    		timeSinceArtistsLastSong.entrySet().removeIf(e -> new Date().getTime() >= (timeSinceArtistsLastSong.get(e.getKey()) + (Long.parseLong(options.getValue("time_between_artists")) * 60000)));
 					if (secondsCount >= Integer.parseInt(options.getValue("time_between_ids"))) {
 						try {
 							File[] stationIDFileList = FileOps.getStationIDFileList();
