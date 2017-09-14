@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Random;
 
 import com.mpatric.mp3agic.ID3v1;
@@ -42,7 +44,7 @@ public class ShufflizerController {
 	public Label nowPlayingLabel;
 
 	Options options = new Options();
-	public ArrayList<File> prevMusicPlayed = new ArrayList<File>();
+	public HashMap<String, Long> timeSinceArtistsLastSong = new HashMap<String, Long>();
 	public int secondsCount;
 	public Random random = new Random();
 	public Thread musicThread;
@@ -50,6 +52,7 @@ public class ShufflizerController {
 	public File musicFile;
 	public File idFile;
 	public MediaPlayer musicPlayer;
+	public Media media;
 
 	public void initialize() {
 		optionsButton.setOnAction(event -> {
@@ -67,6 +70,7 @@ public class ShufflizerController {
 			TextField timeBetweenIDs = new TextField(options.getValue("time_between_ids"));
 			TextField logDateFormat = new TextField(options.getValue("log_date_format"));
 			TextField stationName = new TextField(options.getValue("station_name"));
+			TextField timeBetweenArtists = new TextField(options.getValue("time_between_artists"));
 			grid.add(new Label("Song Path"), 0, 0);
 			grid.add(songPath, 1, 0);
 			grid.add(new Label("ID Path"), 0, 1);
@@ -79,6 +83,8 @@ public class ShufflizerController {
 			grid.add(logDateFormat, 1, 4);
 			grid.add(new Label("Station Name"), 0, 5);
 			grid.add(stationName, 1, 5);
+			grid.add(new Label("Time Between Artists (min)"), 0, 6);
+			grid.add(timeBetweenArtists, 1, 6);
 			dialog.getDialogPane().setContent(grid);
 			dialog.showAndWait().ifPresent(result -> {
 				if (result == saveButtonType) {
@@ -88,6 +94,7 @@ public class ShufflizerController {
 					options.setValue("time_between_ids", timeBetweenIDs.getText());
 					options.setValue("log_date_format", logDateFormat.getText());
 					options.setValue("station_name", stationName.getText());
+					options.setValue("time_between_artists", timeBetweenArtists.getText());
 				}
 			});
 		});
@@ -108,7 +115,6 @@ public class ShufflizerController {
 				Label label = new Label("Full stacktrace:");
 				TextArea textArea = new TextArea(stackTrace);
 				textArea.setEditable(false);
-				textArea.setWrapText(true);
 				textArea.setMaxWidth(Double.MAX_VALUE);
 				textArea.setMaxHeight(Double.MAX_VALUE);
 				GridPane.setVgrow(textArea, Priority.ALWAYS);
@@ -157,6 +163,11 @@ public class ShufflizerController {
 		    public void run() {
 		    	musicPlayingLoop:
 		    	while(true){
+		    		for (String key : timeSinceArtistsLastSong.keySet()) {
+		    			if (new Date().getTime() >= (timeSinceArtistsLastSong.get(key) + (Long.parseLong(options.getValue("time_between_artists")) * 60000))) {
+							timeSinceArtistsLastSong.remove(key);
+						}
+		    		}
 					if (secondsCount >= Integer.parseInt(options.getValue("time_between_ids"))) {
 						try {
 							File[] stationIDFileList = FileOps.getStationIDFileList();
@@ -181,7 +192,7 @@ public class ShufflizerController {
 								Thread.sleep(musicMp3file.getLengthInMilliseconds());
 							} catch (InterruptedException e) {
 								musicPlayer.stop();
-								prevMusicPlayed.clear();
+								timeSinceArtistsLastSong.clear();
 								break musicPlayingLoop;
 							}
 						} catch (MediaException me) {
@@ -210,17 +221,22 @@ public class ShufflizerController {
 							while(true) {
 								int musicFileIndex = random.nextInt(musicFileList.size());
 								musicFile = musicFileList.get(musicFileIndex);
-								if (!prevMusicPlayed.contains(musicFile)) {
-									if (prevMusicPlayed.size() > 5) {
-										prevMusicPlayed.remove(0);
-									}
-									prevMusicPlayed.add(musicFile);
+								media = new Media(musicFile.toURI().toString());
+								musicPlayer = new MediaPlayer(media);
+								musicMp3file = new Mp3File(musicFile.getAbsolutePath());
+								String artist;
+								if (musicMp3file.hasId3v1Tag()) {
+									artist = musicMp3file.getId3v1Tag().getArtist();
+								} else if (musicMp3file.hasId3v2Tag()) {
+									artist = musicMp3file.getId3v2Tag().getArtist();
+								} else {
+									break noRepeatsLoop;
+								}
+								if (!timeSinceArtistsLastSong.containsKey(artist)) {
+									timeSinceArtistsLastSong.put(artist, new Date().getTime());
 									break noRepeatsLoop;
 								}
 							}
-							Media media = new Media(musicFile.toURI().toString());
-							musicPlayer = new MediaPlayer(media);
-							musicMp3file = new Mp3File(musicFile.getAbsolutePath());
 							if (musicMp3file.hasId3v1Tag()) {
 								ID3v1 id3v1Tag = musicMp3file.getId3v1Tag();
 								updateNowPlayingText(id3v1Tag.getTitle() + " - " + id3v1Tag.getArtist());
@@ -237,7 +253,7 @@ public class ShufflizerController {
 								Thread.sleep(musicMp3file.getLengthInMilliseconds());
 							} catch (InterruptedException e) {
 								musicPlayer.stop();
-								prevMusicPlayed.clear();
+								timeSinceArtistsLastSong.clear();
 								secondsCount = 0;
 								break musicPlayingLoop;
 							}

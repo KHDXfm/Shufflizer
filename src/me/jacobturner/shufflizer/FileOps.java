@@ -63,7 +63,7 @@ public class FileOps {
 	public static String genreCheck() throws Exception {
 		String genre = "";
 		String line = "";
-		String cvsSplitBy = ",";
+		String csvSplitBy = ",";
 		String currentDayOfWeek = DateTimeFormatter.ofPattern("EEEE").format(LocalDateTime.now());
 		String currentTimeString = DateTimeFormatter.ofPattern("HH:mm").format(LocalDateTime.now());
 		File scheduleFile = new File("schedule.csv");
@@ -71,7 +71,7 @@ public class FileOps {
 			FileReader fr = new FileReader(scheduleFile);
 			BufferedReader br = new BufferedReader(fr);
 			while ((line = br.readLine()) != null) {
-				String[] genreLine = line.split(cvsSplitBy);
+				String[] genreLine = line.split(csvSplitBy);
 				if (currentDayOfWeek.equals(genreLine[0])) {
 					LocalTime currentTime = LocalTime.parse(currentTimeString);
 					LocalTime startTime = LocalTime.parse(genreLine[1]);
@@ -96,13 +96,13 @@ public class FileOps {
 	public static ArrayList<String> getGenres() throws Exception {
 		ArrayList<String> genres = new ArrayList<String>();
 		String line = "";
-		String cvsSplitBy = ",";
+		String csvSplitBy = ",";
 		File scheduleFile = new File("schedule.csv");
 		if (scheduleFile.exists()) {
 			FileReader fr = new FileReader(scheduleFile);
 			BufferedReader br = new BufferedReader(fr);
 			while ((line = br.readLine()) != null) {
-				String[] genreLine = line.split(cvsSplitBy);
+				String[] genreLine = line.split(csvSplitBy);
 				genres.add(genreLine[3]);
 			}
 			fr.close();
