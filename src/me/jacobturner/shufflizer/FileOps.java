@@ -76,14 +76,8 @@ public class FileOps {
 					LocalTime currentTime = LocalTime.parse(currentTimeString);
 					LocalTime startTime = LocalTime.parse(genreLine[1]);
 					LocalTime endTime = LocalTime.parse(genreLine[2]);
-					if (startTime.isBefore(endTime)) {
-						if (currentTime.isAfter(startTime) && currentTime.isBefore(endTime)) {
-							genre = genreLine[3];
-						} else {
-							if (startTime.isBefore(currentTime) || currentTime.isAfter(endTime)) {
-								genre = genreLine[3];
-							}
-						}
+					if (currentTime.isAfter(startTime) && currentTime.isBefore(endTime)) {
+						genre = genreLine[3];
 					}
 				}	
 			}

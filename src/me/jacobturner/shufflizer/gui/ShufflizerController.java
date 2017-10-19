@@ -171,7 +171,7 @@ public class ShufflizerController {
 							idFile = stationIDFileList[idIndex];
 							Media media = new Media(idFile.toURI().toString());
 							musicPlayer = new MediaPlayer(media);
-							musicMp3file = new Mp3File(idFile.getAbsolutePath());
+							musicMp3file = new Mp3File(idFile.getAbsolutePath(), 65536, true, true);
 							if (musicMp3file.hasId3v1Tag()) {
 								ID3v1 id3v1Tag = musicMp3file.getId3v1Tag();
 								updateNowPlayingText(id3v1Tag.getTitle() + " - " + id3v1Tag.getArtist());
@@ -219,7 +219,7 @@ public class ShufflizerController {
 								musicFile = musicFileList.get(musicFileIndex);
 								media = new Media(musicFile.toURI().toString());
 								musicPlayer = new MediaPlayer(media);
-								musicMp3file = new Mp3File(musicFile.getAbsolutePath());
+								musicMp3file = new Mp3File(musicFile.getAbsolutePath(), 65536, true, true);
 								String artist;
 								if (musicMp3file.hasId3v1Tag()) {
 									artist = musicMp3file.getId3v1Tag().getArtist();
