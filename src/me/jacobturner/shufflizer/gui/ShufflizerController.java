@@ -8,11 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 
-import com.mpatric.mp3agic.ID3v1;
-import com.mpatric.mp3agic.ID3v2;
-import com.mpatric.mp3agic.Mp3File;
-
 import javafx.application.Platform;
+import javafx.collections.ObservableMap;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -48,7 +45,6 @@ public class ShufflizerController {
 	public int secondsCount;
 	public Random random = new Random();
 	public Thread musicThread;
-	public Mp3File musicMp3file;
 	public File musicFile;
 	public File idFile;
 	public MediaPlayer musicPlayer;
@@ -171,11 +167,13 @@ public class ShufflizerController {
 							idFile = stationIDFileList[idIndex];
 							Media media = new Media(idFile.toURI().toString());
 							musicPlayer = new MediaPlayer(media);
-							musicMp3file = new Mp3File(idFile.getAbsolutePath());
-							if (musicMp3file.hasId3v2Tag()) {
-								updateNowPlayingText(musicMp3file.getId3v2Tag().getTitle() + " - " + musicMp3file.getId3v2Tag().getArtist());
-							} else if (musicMp3file.hasId3v1Tag()) {
-								updateNowPlayingText(musicMp3file.getId3v1Tag().getTitle() + " - " + musicMp3file.getId3v1Tag().getArtist());
+							while (!(musicPlayer.getStatus().equals(MediaPlayer.Status.READY))) {}
+							if (media.getDuration().isUnknown()) {
+								throw new Exception(idFile.toURI().toString() + ": cannot play unknown length");
+							}
+							ObservableMap<String, Object> fileMetadata = media.getMetadata();
+							if (fileMetadata.containsKey("title") && fileMetadata.containsKey("artist")) {
+								updateNowPlayingText(fileMetadata.get("title") + " - " + fileMetadata.get("artist"));
 							} else {
 								updateNowPlayingText("Station Identification - " + options.getValue("station_name"));
 							}
@@ -183,7 +181,7 @@ public class ShufflizerController {
 							secondsCount = 0;
 							musicPlayer.play();
 							try {
-								Thread.sleep(musicMp3file.getLengthInMilliseconds());
+								Thread.sleep((long)media.getDuration().toMillis());
 							} catch (InterruptedException e) {
 								musicPlayer.stop();
 								timeSinceArtistsLastSong.clear();
@@ -211,18 +209,21 @@ public class ShufflizerController {
 						try {
 							String genreToPlay = FileOps.genreCheck();
 							ArrayList<File> musicFileList = FileOps.getMusicFileList(genreToPlay);
+							ObservableMap<String, Object> fileMetadata;
 							noRepeatsLoop:
 							while(true) {
 								int musicFileIndex = random.nextInt(musicFileList.size());
 								musicFile = musicFileList.get(musicFileIndex);
 								media = new Media(musicFile.toURI().toString());
 								musicPlayer = new MediaPlayer(media);
-								musicMp3file = new Mp3File(musicFile.getAbsolutePath());
+								while (!(musicPlayer.getStatus().equals(MediaPlayer.Status.READY))) {}
+								if (media.getDuration().isUnknown()) {
+									throw new Exception(idFile.toURI().toString() + ": cannot play unknown length");
+								}
+								fileMetadata = media.getMetadata();
 								String artist;
-								if (musicMp3file.hasId3v2Tag()) {
-									artist = musicMp3file.getId3v2Tag().getArtist();
-								} else if (musicMp3file.hasId3v1Tag()) {
-									artist = musicMp3file.getId3v1Tag().getArtist();
+								if (fileMetadata.containsKey("artist")) {
+									artist = (String)fileMetadata.get("artist");
 								} else {
 									break noRepeatsLoop;
 								}
@@ -231,18 +232,16 @@ public class ShufflizerController {
 									break noRepeatsLoop;
 								}
 							}
-							if (musicMp3file.hasId3v2Tag()) {
-								updateNowPlayingText(musicMp3file.getId3v2Tag().getTitle() + " - " + musicMp3file.getId3v2Tag().getArtist());
-							} else if (musicMp3file.hasId3v1Tag()) {
-								updateNowPlayingText(musicMp3file.getId3v1Tag().getTitle() + " - " + musicMp3file.getId3v1Tag().getArtist());
+							if (fileMetadata.containsKey("title") && fileMetadata.containsKey("artist")) {
+								updateNowPlayingText(fileMetadata.get("title") + " - " + fileMetadata.get("artist"));
 							} else {
 								updateNowPlayingText(options.getValue("station_name") + " - " + options.getValue("station_name"));
 							}
 							updateNowPlayingColor(Color.BLACK);
-							secondsCount += musicMp3file.getLengthInSeconds();
+							secondsCount += media.getDuration().toSeconds();
 							musicPlayer.play();
 							try {
-								Thread.sleep(musicMp3file.getLengthInMilliseconds());
+								Thread.sleep((long)media.getDuration().toMillis());
 							} catch (InterruptedException e) {
 								musicPlayer.stop();
 								timeSinceArtistsLastSong.clear();

@@ -5,9 +5,6 @@ Shufflizer was coded by [Jacob Turner](http://jacobturner.me), who releases this
 
 **NOTE: Some features are dependent on [Nicecast](https://www.rogueamoeba.com/nicecast/) by Rogue Amoeba Software.**
 
-This project uses the following libraries:
-* [mp3agic](http://github.com/mpatric/mp3agic), released under the MIT license
-
 ## Schedule Syntax
 If a schedule.csv file is present in the directory where Shufflizer is stored, then it will be scanned to see if a certain genre should be played at certain times.
 Genres are in folders under the songpath variable (for example, if songpath is *C:\Music*, the genre folder is *C:\Music\Genre*).
