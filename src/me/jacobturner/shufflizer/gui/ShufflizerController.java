@@ -167,7 +167,8 @@ public class ShufflizerController {
 							idFile = stationIDFileList[idIndex];
 							Media media = new Media(idFile.toURI().toString());
 							musicPlayer = new MediaPlayer(media);
-							while (!(musicPlayer.getStatus().equals(MediaPlayer.Status.READY))) {}
+							// TODO: better solution for this
+							Thread.sleep(500);
 							if (media.getDuration().isUnknown()) {
 								throw new Exception(idFile.toURI().toString() + ": cannot play unknown length");
 							}
@@ -216,10 +217,8 @@ public class ShufflizerController {
 								musicFile = musicFileList.get(musicFileIndex);
 								media = new Media(musicFile.toURI().toString());
 								musicPlayer = new MediaPlayer(media);
-								while (!(musicPlayer.getStatus().equals(MediaPlayer.Status.READY))) {}
-								if (media.getDuration().isUnknown()) {
-									throw new Exception(idFile.toURI().toString() + ": cannot play unknown length");
-								}
+								// TODO: better solution for this
+								Thread.sleep(500);
 								fileMetadata = media.getMetadata();
 								String artist;
 								if (fileMetadata.containsKey("artist")) {
