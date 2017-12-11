@@ -3,6 +3,7 @@ package me.jacobturner.shufflizer.gui;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -174,7 +175,7 @@ public class ShufflizerController {
 							}
 							ObservableMap<String, Object> fileMetadata = media.getMetadata();
 							if (fileMetadata.containsKey("title") && fileMetadata.containsKey("artist")) {
-								updateNowPlayingText(fileMetadata.get("title") + " - " + fileMetadata.get("artist"));
+								updateNowPlayingText(Normalizer.normalize((String)fileMetadata.get("title"), Normalizer.Form.NFD) + " - " + Normalizer.normalize((String)fileMetadata.get("artist"), Normalizer.Form.NFD));
 							} else {
 								updateNowPlayingText("Station Identification - " + options.getValue("station_name"));
 							}
@@ -222,7 +223,7 @@ public class ShufflizerController {
 								fileMetadata = media.getMetadata();
 								String artist;
 								if (fileMetadata.containsKey("artist")) {
-									artist = (String)fileMetadata.get("artist");
+									artist = Normalizer.normalize((String)fileMetadata.get("artist"), Normalizer.Form.NFD);
 								} else {
 									break noRepeatsLoop;
 								}
@@ -232,7 +233,7 @@ public class ShufflizerController {
 								}
 							}
 							if (fileMetadata.containsKey("title") && fileMetadata.containsKey("artist")) {
-								updateNowPlayingText(fileMetadata.get("title") + " - " + fileMetadata.get("artist"));
+								updateNowPlayingText(Normalizer.normalize((String)fileMetadata.get("title"), Normalizer.Form.NFD) + " - " + Normalizer.normalize((String)fileMetadata.get("artist"), Normalizer.Form.NFD));
 							} else {
 								updateNowPlayingText(options.getValue("station_name") + " - " + options.getValue("station_name"));
 							}
