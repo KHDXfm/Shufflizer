@@ -171,15 +171,15 @@ public class ShufflizerController {
 							idFile = stationIDFileList[idIndex];
 							Media media = new Media(idFile.toURI().toString());
 							musicPlayer = new MediaPlayer(media);
-							musicMp3file = new Mp3File(idFile.getAbsolutePath(), 65536, true, true);
-							if (musicMp3file.hasId3v1Tag()) {
-								ID3v1 id3v1Tag = musicMp3file.getId3v1Tag();
-								updateNowPlayingText(id3v1Tag.getTitle() + " - " + id3v1Tag.getArtist());
-							} else if (musicMp3file.hasId3v2Tag()) {
+							musicMp3file = new Mp3File(idFile.getAbsolutePath());
+							if (musicMp3file.hasId3v2Tag()) {
 								ID3v2 id3v2Tag = musicMp3file.getId3v2Tag();
 								updateNowPlayingText(id3v2Tag.getTitle() + " - " + id3v2Tag.getArtist());
+							} else if (musicMp3file.hasId3v1Tag()) {
+								ID3v1 id3v1Tag = musicMp3file.getId3v1Tag();
+								updateNowPlayingText(id3v1Tag.getTitle() + " - " + id3v1Tag.getArtist());
 							} else {
-								updateNowPlayingText(options.getValue("station_name") + " - Station Identification");
+								updateNowPlayingText("Station Identification - " + options.getValue("station_name"));
 							}
 							updateNowPlayingColor(Color.BLUE);
 							secondsCount = 0;
@@ -219,7 +219,7 @@ public class ShufflizerController {
 								musicFile = musicFileList.get(musicFileIndex);
 								media = new Media(musicFile.toURI().toString());
 								musicPlayer = new MediaPlayer(media);
-								musicMp3file = new Mp3File(musicFile.getAbsolutePath(), 65536, true, true);
+								musicMp3file = new Mp3File(musicFile.getAbsolutePath());
 								String artist;
 								if (musicMp3file.hasId3v1Tag()) {
 									artist = musicMp3file.getId3v1Tag().getArtist();
@@ -233,12 +233,12 @@ public class ShufflizerController {
 									break noRepeatsLoop;
 								}
 							}
-							if (musicMp3file.hasId3v1Tag()) {
-								ID3v1 id3v1Tag = musicMp3file.getId3v1Tag();
-								updateNowPlayingText(id3v1Tag.getTitle() + " - " + id3v1Tag.getArtist());
-							} else if (musicMp3file.hasId3v2Tag()) {
+							if (musicMp3file.hasId3v2Tag()) {
 								ID3v2 id3v2Tag = musicMp3file.getId3v2Tag();
 								updateNowPlayingText(id3v2Tag.getTitle() + " - " + id3v2Tag.getArtist());
+							} else if (musicMp3file.hasId3v1Tag()) {
+								ID3v1 id3v1Tag = musicMp3file.getId3v1Tag();
+								updateNowPlayingText(id3v1Tag.getTitle() + " - " + id3v1Tag.getArtist());
 							} else {
 								updateNowPlayingText(options.getValue("station_name") + " - " + options.getValue("station_name"));
 							}
